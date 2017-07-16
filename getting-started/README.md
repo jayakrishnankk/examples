@@ -6,10 +6,11 @@
 
  * Prerequisites
  * Download and installation
- * Getting started with Elastic Search
  * Kibana Installation
+ * X-Pack Installation
+ * Getting started with Elastic Search
 
-**Main Features**
+**Main Features of elasticsearch**
 
  * Horizontal Scale
  * Real-Time Availability
@@ -21,7 +22,7 @@
 ## Prerequisites
 Elastic search requires Java 8.
 
-**Linux - Ubuntu**
+**Linux**
 Installing oracle java 8
 
 ```
@@ -34,22 +35,25 @@ java -version
 ## Download and Install
 Pick the latest elasticsearch download link using this link : [Download](https://www.elastic.co/downloads/elasticsearch)
 
+Recommended to use tarball if you are a beginner
+
 ```
 wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.5.0.tar.gz
 tar -xzf elasticsearch-5.5.0.tar.gz
 cd elasticsearch-5.5.0/
-//if you are a beginner, get familiarized with directory structure. Specifically bin and config
+//get familiarized with directory structure, specifically bin and config
 ```
 
 ## Getting Started with Elastic Search
-Start elastic search by going to into bin directory.
+Start elastic search.
 ```
 ./bin/elasticsearch
 
-//to verify the installation and setup
+//You may also open this url in browser.
+//To verify the installation and setup.
 curl -XGET http://localhost:9200
 
-//You should get something like this in the console
+//You should get something like this in command line
 {
   "name": "f7RZM1d",
   "cluster_name": "elasticsearch",
@@ -67,6 +71,7 @@ curl -XGET http://localhost:9200
 Congratulations! You have completed the first step!
 
 ## Kibana Installation
+Pick the latest kibana download link using this link : [Download](https://www.elastic.co/downloads/kibana)
 
 ```
 wget https://artifacts.elastic.co/downloads/kibana/kibana-5.5.0-linux-x86_64.tar.gz
@@ -76,18 +81,64 @@ cd kibana/
 
 //You should see this log in console
 //log   [00:35:35.985] [info][listening] Server running at http://localhost:5601
-//Open this url in browser: default username=elastic; password=changeme
 ```
 
-Congratulations! You have setup Kibana and ready to use elasticsearch with a visual tool.
+Congratulations! You have setup Kibana and ready to use elasticsearch with this awesome tool!
 
 # Elastic Search basics - commands
 Please go through the following [video](https://www.elastic.co/webinars/getting-started-elasticsearch). 
 
 This is a very good first tutorial on elastic search and Kibana. The commands used in this video is listed here.
 
+Open kibana http://localhost:5601 and go to Dev Tools
+
+Useful commands
 ```
 GET /
+
+POST /my-index/my-type/1
+{
+    "body": "foo"
+}
+
+GET /my-index/my-type/1
+
+GET /my-index/_search
+{
+    "query": {
+        "match": {
+            "body": "foo"
+        }
+    }
+}
+
+DELETE /my-index/my-type/1
+```
+
+# X-Pack Installation
+Stop elasticsearch and kibana first.
+Install plugins and then start both elasticsearch and kibana back again
+
+```
+//Ctrl + C to exit elasticsearch and kibana
+//Run inside elasticsearch directory
+./bin/elasticsearch-plugin install x-pack
+./bin/elasticsearch
+
+//Inside kibana directory
+./bin/kibana-plugin install x-pack
+./bin/kibana
+```
+
+Kibana x-pack installation includes setting up the bundles, and typically takes some time. Please be patient.
+After kibana startup, you should see login page now at http://localhost:5601.
+
+Default username = elastic; password = changeme 
+
+You can see more functionalities added to Kibana UI including Monitoring, Management, Graph etc.
+
+```
+# Start by creating the "library" index, an optional step
 
 PUT /library
 {
@@ -96,6 +147,10 @@ PUT /library
     "index.number_of_replicas": 0
   }
 }
+
+
+# Bulk indexing and Search
+# When you need to index a lot of docs, you should use the bulk API
 
 POST /library/books/_bulk
 {"index": {"_id": 1}}
@@ -109,8 +164,15 @@ POST /library/books/_bulk
 {"index": {"_id": 5}}
 {"title": "Lazy dog", "price": 9, "colors": ["red", "blue", "green"]}
 
+# More info: https://www.elastic.co/guide/en/elasticsearch/guide/current/bulk.html
+
+
+# Find all documents
 
 GET /library/books/_search
+
+
+# Query example : find all fox
 
 GET /library/books/_search
 {
@@ -121,6 +183,9 @@ GET /library/books/_search
   }
 }
 
+
+# Query example : "quick" and "dog"
+
 GET /library/books/_search
 {
   "query": {
@@ -129,6 +194,9 @@ GET /library/books/_search
     }
   }
 }
+
+
+# Query example: match_phrase = exact match
 
 GET /library/books/_search
 {
@@ -139,6 +207,9 @@ GET /library/books/_search
   }
 }
 
+
+# Have a look at the relevance (.score) : using BM25 algorithm
+
 GET /library/books/_search
 {
   "query": {
@@ -147,6 +218,9 @@ GET /library/books/_search
     }
   }
 }
+
+
+# Boolean query combinations : "must" match.
 
 GET /library/books/_search
 {
@@ -168,6 +242,9 @@ GET /library/books/_search
   }
 }
 
+
+# Boolean query combinations : "must_not" example.
+
 GET /library/books/_search
 {
   "query": {
@@ -187,6 +264,9 @@ GET /library/books/_search
     }
   }
 }
+
+
+# Boolean query combinations : "should" = not necessarily a "must", but scoring affected by matches.
 
 GET /library/books/_search
 {
@@ -212,6 +292,9 @@ GET /library/books/_search
     }
   }
 }
+
+
+# "highlight" example. Very useful in autocomplete dropdowns.
 
 GET /library/books/_search
 {
@@ -243,6 +326,9 @@ GET /library/books/_search
   }
 }
 
+
+# "filter" example. Filter documents based on criteria
+
 GET /library/books/_search
 {
   "query": {
@@ -266,6 +352,9 @@ GET /library/books/_search
   }
 }
 
+
+# "filter" example, no query.
+
 GET /library/books/_search
 {
   "query": {
@@ -280,6 +369,9 @@ GET /library/books/_search
     }
   }
 }
+
+
+# "analyze" examples. 
 
 GET /library/_analyze
 {
@@ -333,6 +425,9 @@ GET /library/_analyze
   "text": "elastic@example.com website: https://www.elastic.co"
 }
 
+
+# "aggs" examples. Aggregations
+
 GET /library/_search
 {
   "size": 0,
@@ -344,6 +439,9 @@ GET /library/_search
     }
   }
 }
+
+
+# "aggs" examples. Aggregations with filters
 
 GET /library/_search
 {
@@ -360,6 +458,9 @@ GET /library/_search
     }
   }
 }
+
+
+# "aggs" examples. Simple and nested aggregations.
 
 GET /library/_search
 {
@@ -385,6 +486,9 @@ GET /library/_search
   }
 }
 
+
+# document update. versions get upgraded during each update.
+
 POST /library/books/1
 {
   "title": "The quick brown fox",
@@ -401,7 +505,13 @@ POST /library/books/1/_update
 
 GET /library/books/1
 
+
+# "_mapping". Elasticsearch will dynamically define your schema when documents are indexed
+
 GET library/_mapping
+
+
+# Define index setting when it is created
 
 PUT /famous-librarians
 {
@@ -446,6 +556,18 @@ PUT /famous-librarians
 }
 
 PUT /famous-librarians/librarian/1
+{
+  "name": "Sarah Byrd Askew",
+  "favorite-colors": ["yellow", "light-grey"],
+  "birth-date": "1877-02-15",
+  "hometown": {
+    "lat": 32.349722,
+    "lon": -87.641111
+  },
+  "description": "An American public librarian who pioneered the establishment of country libraries in the United States - https://en.wikipedia.org/wiki/Sarah_Byrd_Askew"
+}
+
+PUT /famous-librarians/librarian/2
 {
   "name": "John L. Beckley",
   "favorite-colors": ["red", "off-white"],
