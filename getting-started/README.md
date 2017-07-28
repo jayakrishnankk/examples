@@ -133,9 +133,9 @@ Install plugins and then start both elasticsearch and kibana back again
 Kibana x-pack installation includes setting up the bundles, and typically takes some time. Please be patient.
 After kibana startup, you should see login page now at http://localhost:5601.
 
-Default username = elastic; password = changeme 
+Default username = `elastic` and password = `changeme` 
 
-You can see more functionalities added to Kibana UI including Monitoring, Management, Graph etc.
+You can see more functionalities added to Kibana UI. For example, Monitoring and Graph.
 
 ```
 # Start by creating the "library" index, an optional step
@@ -528,27 +528,27 @@ PUT /famous-librarians
           }
         }
       }
-    },
-    "mappings": {
-      "librarian": {
-        "properties": {
-          "name": {
-            "type": "text"
-          },
-          "favorite-colors": {
-            "type": "keyword"
-          },
-          "birth-date": {
-            "type": "date",
-            "format": "year_month_day"
-          },
-          "hometown": {
-            "type": "geo_point"
-          },
-          "description": {
-            "type": "text",
-            "analyzer": "my-desc-analyzer"
-          }
+    }
+  },
+  "mappings": {
+    "librarian": {
+      "properties": {
+        "name": {
+          "type": "text"
+        },
+        "favorite-colors": {
+          "type": "keyword"
+        },
+        "birth-date": {
+          "type": "date",
+          "format": "year_month_day"
+        },
+        "hometown": {
+          "type": "geo_point"
+        },
+        "description": {
+          "type": "text",
+          "analyzer": "my-desc-analyzer"
         }
       }
     }
